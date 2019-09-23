@@ -1,5 +1,6 @@
 package com.nlp.serialport.thread;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
@@ -33,19 +34,25 @@ public abstract class SerialPortReadThread extends Thread {
                     return;
                 }
 
-                Log.i(TAG, "run: ");
-                int size = mInputStream.read(mReadBuffer);
+                if(mInputStream.available()>0){  //变成io不阻塞;解决了io阻塞后，下一次的开头数据会被上次阻塞的io所读取，导致下次io部分数据缺失
+                    SystemClock.sleep(100);  //解决分包,100这个值要根据包大小而决定
 
-                if (-1 == size || 0 >= size) {
-                    return;
+                    Log.i(TAG, "run: ");
+                    int size = mInputStream.read(mReadBuffer);
+
+                    if (-1 == size || 0 >= size) {
+                        return;
+                    }
+
+                    byte[] readBytes = new byte[size];
+
+                    System.arraycopy(mReadBuffer, 0, readBytes, 0, size);
+
+                    Log.i(TAG, "run: readBytes = " + new String(readBytes));
+                    onDataReceived(readBytes);
+                }else{
+                    SystemClock.sleep(100); //解决粘包
                 }
-
-                byte[] readBytes = new byte[size];
-
-                System.arraycopy(mReadBuffer, 0, readBytes, 0, size);
-
-                Log.i(TAG, "run: readBytes = " + new String(readBytes));
-                onDataReceived(readBytes);
 
             } catch (IOException e) {
                 e.printStackTrace();

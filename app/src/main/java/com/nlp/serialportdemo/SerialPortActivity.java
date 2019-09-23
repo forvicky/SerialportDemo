@@ -15,6 +15,7 @@ import com.nlp.serialport.Device;
 import com.nlp.serialport.SerialPortManager;
 import com.nlp.serialport.listener.OnOpenSerialPortListener;
 import com.nlp.serialport.listener.OnSerialPortDataListener;
+import com.nlp.serialport.utils.HexUtil;
 
 import java.io.File;
 import java.util.Arrays;
@@ -44,8 +45,10 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
                 .setOnSerialPortDataListener(new OnSerialPortDataListener() {
                     @Override
                     public void onDataReceived(byte[] bytes) {
-                        Log.e(TAG, "onDataReceived [ byte[] ]: " + Arrays.toString(bytes));
-                        Log.e(TAG, "onDataReceived [ String ]: " + new String(bytes));
+                        Log.e(TAG, "串口接收到的数据onDataReceived size= "+bytes.length+"||" + Arrays.toString(bytes));
+                        Log.e(TAG, "串口接收到的数据onDataReceived size= "+bytes.length+"||" + HexUtil.toHexString(bytes));
+
+//                        Log.e(TAG, "onDataReceived [ String ]: " + new String(bytes));
                         final byte[] finalBytes = bytes;
                         runOnUiThread(new Runnable() {
                             @Override
